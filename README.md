@@ -7,13 +7,22 @@
 * Rails version: 5.2.1
 * Mysql version: 5.7
 
+## How to use this example
+
+- Generate a new rails app
+- Copy `docker` folder and `docker-compose.yml` to the newly generated app
+- Build
+
 ## Use docker for development
 
 - Install docker CE: https://docs.docker.com/install/linux/docker-ce/ubuntu/
 - First time installation:
 
     - Build Containers: `docker-compose build` 
-    - Start Services: `docker-compose run -d spring (or mysql, redis)`
+    - Start Services: 
+      - `docker-compose run -d mysql`
+      - `docker-compose run -d redis` 
+      - `docker-compose run -d spring`
 
 - Make sure that all background container started successfully, run `docker ps` to check that.
 - All rails commands can be run with `docker exec -it spring *command*`. For example, `docker exec -it spring rails c`.
