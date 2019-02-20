@@ -1,4 +1,4 @@
-version: '2'
+version: '3'
 
 ### Change the `project` with your own project name ###
 services:
@@ -11,14 +11,14 @@ services:
         container_name: project_workspace
         restart: always
         image: framgia/laravel-workspace
-        volumes_from:
+        links:
             - application
         tty: true
     php-fpm:
         container_name: project_php-fpm
         restart: always
         image: framgia/laravel-php-fpm
-        volumes_from:
+        links:
             - application
         expose:
             - "9000"
@@ -28,7 +28,7 @@ services:
         container_name: project_nginx
         restart: always
         image: framgia/laravel-nginx
-        volumes_from:
+        links:
             - data
             - logs
             - application
@@ -57,8 +57,8 @@ services:
     mysql:
         container_name: project_mysql
         restart: always
-        image: mysql
-        volumes_from:
+        image: mysql:5.7
+        links:
             - data
             - logs
         expose:
@@ -72,7 +72,7 @@ services:
         container_name: project_mysql_test
         restart: always
         image: mysql
-        volumes_from:
+        links:
             - data_test
         expose:
             - "3306"
@@ -87,7 +87,7 @@ services:
         image: mongo
         expose:
             - "27017"
-        volumes_from:
+        links:
             - data
             - logs
     redis:
@@ -96,5 +96,5 @@ services:
         image: redis
         expose:
             - "6379"
-        volumes_from:
+        links:
             - data

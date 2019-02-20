@@ -7,10 +7,10 @@
 - Cài `docker` và `docker-compose` trong máy
 ## Tiến hành cài đặt
 ### Sử dụng image có sẵn
-> Đây là cách nhanh nhất và cũng đơn giản nhất để setup được các môi trường cơ bản cho 1 ứng dụng web. 
+> Đây là cách nhanh nhất và cũng đơn giản nhất để setup được các môi trường cơ bản cho 1 ứng dụng web.
 Sử dụng các image có sẵn do FramgiaDockerTeam đã build. File `docker-compose.yml` sẽ như sau:
 ```
-version: '2'
+version: '3'
 
 ### Change the `project` with your own project name ###
 services:
@@ -23,14 +23,14 @@ services:
         container_name: project_workspace
         restart: always
         image: framgia/laravel-workspace
-        volumes_from:
+        links:
             - application
         tty: true
     php-fpm:
         container_name: project_php-fpm
         restart: always
         image: framgia/laravel-php-fpm
-        volumes_from:
+        links:
             - application
         expose:
             - "9000"
@@ -40,7 +40,7 @@ services:
         container_name: project_nginx
         restart: always
         image: framgia/laravel-nginx
-        volumes_from:
+        links:
             - data
             - logs
             - application
@@ -70,7 +70,7 @@ services:
         container_name: project_mysql
         restart: always
         image: mysql
-        volumes_from:
+        links:
             - data
             - logs
         expose:
@@ -83,8 +83,8 @@ services:
     mysql_test:
         container_name: project_mysql_test
         restart: always
-        image: mysql
-        volumes_from:
+        image: mysql:5.7
+        links:
             - data_test
         expose:
             - "3306"
@@ -99,7 +99,7 @@ services:
         image: mongo
         expose:
             - "27017"
-        volumes_from:
+        links:
             - data
             - logs
     redis:
@@ -108,7 +108,7 @@ services:
         image: redis
         expose:
             - "6379"
-        volumes_from:
+        links:
             - data
 ```
 Các container sau sẽ được chạy mặc định sau khi chạy lệnh `docker-compose up`:
@@ -127,7 +127,7 @@ Các container sau sẽ được chạy mặc định sau khi chạy lệnh `doc
 #### Cách sử dụng
 - Trong thư mục `root` của dự án, tạo file `docker-compose.yml`, sau đó copy nội dung file ở bên trên phệt vào.
 - Nhớ đổi tên `project` keyword cho đúng với tên dự án thực tế nhé.
-- Các dữ liệu (mysql, redis, mongo data,...) sẽ được lưu trong thư mục `.docker`. Vì thế chúng ta cần tạo thư mục `.docker` bên trong thư mục `root` của dự án và nhớ `chmod 777` và thêm vào file `.gitignore` cho thư mục này nhé. 
+- Các dữ liệu (mysql, redis, mongo data,...) sẽ được lưu trong thư mục `.docker`. Vì thế chúng ta cần tạo thư mục `.docker` bên trong thư mục `root` của dự án và nhớ `chmod 777` và thêm vào file `.gitignore` cho thư mục này nhé.
 - Chạy lênh `docker-compose up -d` và tận hưởng thành quả
 - Chạy lệnh `docker exec -it project_workspace bash` để `exec` vào workspace container. Trong này bạn có thể chạy toàn bộ các lệnh `php artisan` hoặc tương tự
 #### Ưu điểm
@@ -219,10 +219,10 @@ COPY ./docker/nginx.conf /etc/nginx/nginx.conf
 WORKDIR /var/www/html
 ```
 
-Notes: 
+Notes:
 - `nginx:alpine` là base image được sử dụng
 - Thêm user và group mới vì `nginx: alpine` không có default user.
-- Thêm `nginx.conf` để cấu hình server 
+- Thêm `nginx.conf` để cấu hình server
 > File cấu hình `nginx.conf`:
 ```
 events {
@@ -269,7 +269,7 @@ Notes:
 3. Database Service
 ```
 mysql:
-    image: mysql:5.6
+    image: mysql:5.7
     expose:
       - 3306
     environment:
@@ -281,7 +281,7 @@ mysql:
       - ./docker/data/mysql:/var/lib/mysql
 ```
 Notes:
-- `image: mysql:5.6` Service `mysql` này chỉ cần pull `image mysql` về là đủ. Các đặc tả cần thiết khác đều có sẵn trong image này nên ta sẽ không cần viết riêng.
+- `image: mysql:5.7` Service `mysql` này chỉ cần pull `image mysql` về là đủ. Các đặc tả cần thiết khác đều có sẵn trong image này nên ta sẽ không cần viết riêng.
 - `enviroment`: Các biến môi trường. Với định nghĩa như ở trên, mysql sẽ tạo cho chúng ta 1 database và 1 user như vậy. (Nếu không đặc tả thì sẽ chỉ có 1 user root và database mặc định của mysql)
 
 > Cuối cùng ta có được file docker-compose.yml như sau:
